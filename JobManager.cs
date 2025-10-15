@@ -16,7 +16,19 @@ namespace Job_Application_Tracker
         // Lägger till en ny ansökan
         public void AddJob()
         {
-            // TODO: Implementera
+            Console.WriteLine("Företagets namn? "); // Be användare om företagsnamn
+            string companyName = Console.ReadLine(); 
+
+            Console.WriteLine("Jobbtitel? "); // Be användare om jobbtitel
+            string positionTitle = Console.ReadLine();
+
+            Console.WriteLine("Förväntad lön? "); // Be användare om förväntad lön
+            int salaryExpectation = Convert.ToInt32(Console.ReadLine());
+
+            var job = new JobApplication(companyName, positionTitle, salaryExpectation); // Skapa Jobapplication-objekt
+            Applications.Add(job); // Lägg till i listan
+
+            Console.WriteLine($"Ansökan till {companyName} registrerad!");
         }
 
         // Ändrar status på en befintlig ansökan
