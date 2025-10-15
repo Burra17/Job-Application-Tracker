@@ -30,6 +30,7 @@ namespace Job_Application_Tracker
                     case "5":
                         break;
                     case "6":
+                        jobManager.UpdateStatus(); 
                         break;
                     case "7":
                         break;
