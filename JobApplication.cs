@@ -11,6 +11,7 @@ namespace Job_Application_Tracker
         //Attribut
         public string CompanyName { get; set; }
         public string PositionTitle { get; set; }
+        public Status ApplicationStatus { get; set; }
         public enum Status
         {
             Applied,
@@ -21,6 +22,17 @@ namespace Job_Application_Tracker
         public DateTime ApplicationDate { get; set; }
         public DateTime? ResponseDate { get; set; }
         public int SalaryExpectation { get; set; } 
+
+        //Konstruktor
+        public JobApplication(string companyName, string positionTitle, int salaryExpectation)
+        {
+            CompanyName = companyName;
+            PositionTitle = positionTitle;
+            SalaryExpectation = salaryExpectation;
+            ApplicationStatus = Status.Applied;
+            ApplicationDate = DateTime.Now;
+            ResponseDate = null;
+        }
 
 
         //Metoder
