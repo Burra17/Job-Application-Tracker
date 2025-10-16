@@ -25,6 +25,7 @@ namespace Job_Application_Tracker
                         jobManager.ShowAll();
                         break;
                     case "3":
+                        jobManager.ShowByStatus();
                         break;
                     case "4":
                         break;

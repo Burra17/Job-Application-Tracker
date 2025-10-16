@@ -163,7 +163,71 @@ namespace Job_Application_Tracker
         // Filtrerar ansökningar efter status (VG-del)
         public void ShowByStatus()
         {
-            // TODO: Implementera (LINQ)
+            // Kolla om listan är tom
+            if (Applications.Count == 0)
+            {
+                Console.WriteLine("Ingen ansökan finns att filtrera.");
+                return;
+            }
+
+            // Be användaren skriva in status att filtrera på
+            Console.WriteLine("Vilken status vill du visa? (Applied, Interview, Offer, Rejected)");
+            string inputStatus = Console.ReadLine();
+
+            // Försök konvertera användarens input till enum (ignorerar stora/små bokstäver)
+            bool success = Enum.TryParse<JobApplication.Status>(inputStatus, true, out JobApplication.Status filterStatus);
+
+            if (!success)// Om den inte hittar någon med den statusen i listan
+            {
+                Console.WriteLine("Ogiltig status!");
+                return;
+            }
+
+            // Filtrera listan med LINQ – behåll bara ansökningar med vald status
+            var filteredApplications = Applications
+                .Where(a => a.ApplicationStatus == filterStatus);
+
+            // Visa filtrerade ansökningar
+            Console.WriteLine($"Ansökningar med status {filterStatus}:");
+            foreach (var app in filteredApplications)
+            {
+                // Färgkodning beroende på status
+                switch (app.ApplicationStatus)
+                {
+                    case JobApplication.Status.Applied:
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        break;
+
+                    case JobApplication.Status.Offer:
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        break;
+
+                    case JobApplication.Status.Rejected:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        break;
+
+                    case JobApplication.Status.Interview:
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        break;
+
+                    default:
+                        Console.ForegroundColor = ConsoleColor.White;
+                        break;
+                }
+
+                // Visa information om ansökningarna
+                Console.WriteLine($"Företag: {app.CompanyName}");
+                Console.WriteLine($"Tjänst: {app.PositionTitle}");
+                Console.WriteLine($"Status: {app.ApplicationStatus}");
+                Console.WriteLine($"Ansökt: {app.ApplicationDate.ToShortDateString()}");
+                // Funkar som en if sats om Responsedate har värde skriv ut det annars skriv ut inget svar ännu.
+                Console.WriteLine($"Svar: {(app.ResponseDate.HasValue ? app.ResponseDate.Value.ToShortDateString() : "Inget svar ännu")}");
+                Console.WriteLine($"Förväntad lön: {app.SalaryExpectation} kr");
+                Console.WriteLine();
+
+                //  Återställ färg
+                Console.ResetColor();
+            }
         }
 
         // Visar statistik över ansökningar (VG-del)
