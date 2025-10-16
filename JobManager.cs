@@ -233,7 +233,27 @@ namespace Job_Application_Tracker
         // Visar statistik över ansökningar (VG-del)
         public void ShowStatistics()
         {
-            // TODO: Implementera (Count, Average, OrderBy, Where)
+            if ( Applications.Count == 0 )
+            { 
+                Console.WriteLine("Listan är tom");
+                return; 
+            }
+
+            int totalApplications = Applications.Count; // Skapa en variabel för hur många ansökningar som finns med hjälp av count
+            Console.WriteLine($"Totalt antal ansökningar: {totalApplications}"); // Skriva ut antalet till användaren
+
+            var groupByStatus = Applications.GroupBy(a => a.ApplicationStatus); // Grupperar listan efter status genom att använda LINQ
+            foreach (var group in groupByStatus)
+            {
+                Console.WriteLine($"Status: {group.Key} - Antal: {group.Count()}"); // Skriver ut group.key för att få statusen och sedan count för antalet i gryppen
+            }
+
+            // Filtrera bort ansökningar utan svar (ResponseDate = null)
+            var answeredApplications = Applications.Where(a => a.ResponseDate.HasValue);
+
+            // Beräkna genomsnittlig svarstid i antal dagar
+            double averageResponseTime = answeredApplications.Average(a => (a.ResponseDate.Value - a.ApplicationDate).TotalDays);
+            Console.WriteLine($"Genomsnittlig svarstid är {averageResponseTime:f1} dagar"); // Skriver ut antal dagar med en decimal
         }
     }
 }
