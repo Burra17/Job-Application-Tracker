@@ -8,10 +8,38 @@ namespace Job_Application_Tracker
 {
     internal class JobManager
     {
-        // 🔹 Attribut
+        // Attribut
         public List<JobApplication> Applications { get; set; } = new List<JobApplication>(); // Samling av alla ansökningar
 
-        // 🔹 Metoder
+        // Konstruktor – fyller listan med dummydata för testning
+        public JobManager()
+        {
+            Applications = new List<JobApplication>
+            {
+                new JobApplication("Hammarby AB", "Backend Developer", 40000),
+                new JobApplication("Chelsea Tech", "Frontend Developer", 42000)
+                {
+                    ApplicationStatus = JobApplication.Status.Interview,
+                    ApplicationDate = new DateTime(2025, 9, 25),
+                    ResponseDate = new DateTime(2025, 10, 5)
+                },
+                new JobApplication("Volvo Cars", "System Engineer", 48000)
+                {
+                    ApplicationStatus = JobApplication.Status.Offer,
+                    ApplicationDate = new DateTime(2025, 8, 15),
+                    ResponseDate = new DateTime(2025, 9, 1)
+                },
+                new JobApplication("Spotify", "DevOps Engineer", 50000)
+                {
+                    ApplicationStatus = JobApplication.Status.Rejected,
+                    ApplicationDate = new DateTime(2025, 7, 30),
+                    ResponseDate = new DateTime(2025, 8, 10)
+                },
+                new JobApplication("IKEA Digital", "Fullstack Developer", 45000)
+            };
+        }
+
+        // Metoder
 
         // Lägger till en ny ansökan
         public void AddJob()
@@ -82,7 +110,54 @@ namespace Job_Application_Tracker
         // Visar alla ansökningar
         public void ShowAll()
         {
-            // TODO: Implementera
+            // Kolla om listan är tom
+            if (Applications.Count == 0)
+            {
+                Console.WriteLine("Ingen ansökan har registrerats ännu.");
+                return;
+            }
+
+            Console.WriteLine("Alla registrerade ansökningar: ");
+
+            // Loopa igenom alla ansökningar
+            foreach (var app in Applications)
+            {
+                // Färgkodning beroende på status
+                switch (app.ApplicationStatus)
+                {
+                    case JobApplication.Status.Applied:
+                        Console.ForegroundColor = ConsoleColor.Blue; 
+                        break;
+
+                    case JobApplication.Status.Offer:
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        break;
+
+                    case JobApplication.Status.Rejected:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        break;
+
+                    case JobApplication.Status.Interview:
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        break;
+
+                    default:
+                        Console.ForegroundColor = ConsoleColor.White;
+                        break;
+                }
+
+                // Visa information om ansökningarna
+                Console.WriteLine($"Företag: {app.CompanyName}"); 
+                Console.WriteLine($"Tjänst: {app.PositionTitle}");
+                Console.WriteLine($"Status: {app.ApplicationStatus}");
+                Console.WriteLine($"Ansökt: {app.ApplicationDate.ToShortDateString()}");
+                // Funkar som en if sats om Responsedate har värde skriv ut det annars skriv ut inget svar ännu.
+                Console.WriteLine($"Svar: {(app.ResponseDate.HasValue ? app.ResponseDate.Value.ToShortDateString() : "Inget svar ännu")}");
+                Console.WriteLine($"Förväntad lön: {app.SalaryExpectation} kr");
+
+                //  Återställ färg
+                Console.ResetColor();
+            }
         }
 
         // Filtrerar ansökningar efter status (VG-del)

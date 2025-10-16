@@ -22,6 +22,7 @@ namespace Job_Application_Tracker
                         jobManager.AddJob();
                         break;
                     case "2":
+                        jobManager.ShowAll();
                         break;
                     case "3":
                         break;
