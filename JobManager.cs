@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Job_Application_Tracker
 {
-    internal class JobManager
+    public class JobManager
     {
         // Attribut
         public List<JobApplication> Applications { get; set; } = new List<JobApplication>(); // Samling av alla ansökningar
@@ -254,6 +254,51 @@ namespace Job_Application_Tracker
             // Beräkna genomsnittlig svarstid i antal dagar
             double averageResponseTime = answeredApplications.Average(a => (a.ResponseDate.Value - a.ApplicationDate).TotalDays);
             Console.WriteLine($"Genomsnittlig svarstid är {averageResponseTime:f1} dagar"); // Skriver ut antal dagar med en decimal
+        }
+
+        // Skriva ut ansökningar efter datum
+        public void SortedApplications()
+        {
+            if (Applications.Count == 0)
+            {
+                Console.WriteLine("Inga ansökningar finns att sortera.");
+                return;
+            }
+
+            // Sortera ansökningarna efter datum (äldst först)
+            var sortedList = Applications.OrderBy(a => a.ApplicationDate).ToList();
+
+            Console.WriteLine("Ansökningar sorterade efter datum (äldst till nyast):");
+
+            foreach (var app in sortedList)
+            {
+                Console.WriteLine($"Datum: {app.ApplicationDate.ToShortDateString()} - Företag: {app.CompanyName} - Tjänst: {app.PositionTitle} - Status: {app.ApplicationStatus}");
+            }
+        }
+
+        public void RemoveApplication()
+        {
+            if (Applications.Count == 0)
+            {
+                Console.WriteLine("Det finns inga ansökningar att ta bort.");
+                return;
+            }
+
+            Console.WriteLine("Ange företagsnamnet för den ansökan du vill ta bort:");
+            string inputCompany = Console.ReadLine();
+
+            // Hitta ansökan (ignorera stora/små bokstäver)
+            var appToRemove = Applications.FirstOrDefault(a =>
+                a.CompanyName.Equals(inputCompany, StringComparison.OrdinalIgnoreCase));
+
+            if (appToRemove == null)
+            {
+                Console.WriteLine("Ingen ansökan hittades med det företagsnamnet.");
+                return;
+            }
+
+            Applications.Remove(appToRemove);
+            Console.WriteLine($"Ansökan till {appToRemove.CompanyName} har tagits bort.");
         }
     }
 }

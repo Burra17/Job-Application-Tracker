@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Job_Application_Tracker
 {
@@ -33,18 +34,5 @@ namespace Job_Application_Tracker
             ApplicationDate = DateTime.Now;
             ResponseDate = null;
         }
-
-
-        //Metoder
-        public void GetDaysSinceApplied() // returnerar antal dagar sedan ansökan skickades
-        {
-
-        }
-
-        public void GetSummary() // returnerar en kort sammanfattning av ansökan
-        { 
-
-        }
-
     }
 }
