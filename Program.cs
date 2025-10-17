@@ -6,8 +6,9 @@ namespace Job_Application_Tracker
     {
         static void Main(string[] args)
         {
-            // Skapa ett JobManager objektS
+            // Skapa ett JobManager objekt
             var jobManager = new JobManager();
+
             // En Whileloop för att köra så länge användaren vill med switch case baserat på användarens val
             bool running = true;
 
@@ -28,6 +29,7 @@ namespace Job_Application_Tracker
                         jobManager.ShowByStatus();
                         break;
                     case "4":
+                        jobManager.SortedApplications();
                         break;
                     case "5":
                         jobManager.ShowStatistics();
@@ -36,6 +38,7 @@ namespace Job_Application_Tracker
                         jobManager.UpdateStatus(); 
                         break;
                     case "7":
+                        jobManager.RemoveApplication();
                         break;
                     case "8":
                         running = false;
