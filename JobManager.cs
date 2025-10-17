@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Job_Application_Tracker
 {
     public class JobManager
     {
-        // Attribut
-        public List<JobApplication> Applications { get; set; } = new List<JobApplication>(); // Samling av alla ansökningar
+        // Attribut: Lista som innehåller alla jobbansökningar
+        public List<JobApplication> Applications { get; set; } = new List<JobApplication>();
 
-        // Konstruktor – fyller listan med dummydata för testning
+        // Konstruktor – fyller listan med exempeldata för testning
         public JobManager()
         {
             Applications = new List<JobApplication>
@@ -39,266 +37,315 @@ namespace Job_Application_Tracker
             };
         }
 
-        // Metoder
+        // ------------------- METODER -------------------
 
-        // Lägger till en ny ansökan
+        // Lägg till en ny ansökan
         public void AddJob()
         {
-            Console.WriteLine("Företagets namn? "); // Be användare om företagsnamn
-            string companyName = Console.ReadLine(); 
+            Console.Clear(); // Rensa konsolen
+            Console.WriteLine("==== Lägg till ny ansökan ====\n");
 
-            Console.WriteLine("Jobbtitel? "); // Be användare om jobbtitel
+            // Be användaren fylla i information
+            Console.Write("Företagets namn: ");
+            string companyName = Console.ReadLine();
+
+            Console.Write("Jobbtitel: ");
             string positionTitle = Console.ReadLine();
 
-            Console.WriteLine("Förväntad lön? "); // Be användare om förväntad lön
+            Console.Write("Förväntad lön: ");
             int salaryExpectation = Convert.ToInt32(Console.ReadLine());
 
-            var job = new JobApplication(companyName, positionTitle, salaryExpectation); // Skapa Jobapplication-objekt
-            Applications.Add(job); // Lägg till i listan
+            // Skapa nytt JobApplication-objekt och lägg till i listan
+            Applications.Add(new JobApplication(companyName, positionTitle, salaryExpectation));
 
-            Console.WriteLine($"Ansökan till {companyName} registrerad!"); // Skriv ut till användaren
+            // Bekräfta för användaren
+            Console.WriteLine($"\nAnsökan till {companyName} registrerad!");
+            Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
+            Console.ReadKey();
         }
 
-        // Ändrar status på en befintlig ansökan
+        // Uppdatera status på en ansökan
         public void UpdateStatus()
         {
-            if (Applications.Count == 0) // Kollar så att inte listan är tom
+            Console.Clear();
+            Console.WriteLine("==== Uppdatera status på ansökan ====\n");
+
+            // Kontrollera att det finns ansökningar
+            if (Applications.Count == 0)
             {
                 Console.WriteLine("Ingen ansökan finns att uppdatera.");
+                Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
+                Console.ReadKey();
                 return;
             }
 
-            foreach (var status in Applications) // Skriva ut Statusen för jobbansökningarna
+            // Visa alla ansökningar med nuvarande status
+            Console.WriteLine("Nuvarande ansökningar och status:\n");
+            foreach (var app in Applications)
             {
-                Console.WriteLine($"Företag: {status.CompanyName} med status {status.ApplicationStatus}");
+                Console.WriteLine($"{app.CompanyName} - {app.ApplicationStatus}");
             }
 
-            Console.WriteLine("Skriv namnet på företaget du vill uppdatera status: "); // Be användare om företagsnamn
+            // Be användaren ange vilket företag som ska uppdateras
+            Console.Write("\nSkriv namnet på företaget du vill uppdatera: ");
             string inputCompany = Console.ReadLine();
 
-            // Leta efter om CompanyName är lika som det användaren skrev in och ignorera stora, små bokstäver. FirstOrDefault returnerar första elementet som matchar villkoret.
-            var jobToUpdate = Applications.FirstOrDefault(a => a.CompanyName.Equals(inputCompany, StringComparison.OrdinalIgnoreCase));
+            // Hitta ansökan baserat på företagsnamnet (ignorera stora/små bokstäver)
+            var jobToUpdate = Applications.FirstOrDefault(a =>
+                a.CompanyName.Equals(inputCompany, StringComparison.OrdinalIgnoreCase));
 
-            if (jobToUpdate == null) // Om företaget inte hittas i listan
+            if (jobToUpdate == null)
             {
-                Console.WriteLine("Ingen ansökan hittades med det företagsnamnet.");
-                return;
+                Console.WriteLine("\nIngen ansökan hittades med det företagsnamnet.");
+            }
+            else
+            {
+                // Be användaren ange ny status
+                Console.Write("Skriv den nya statusen (Applied, Interview, Offer, Rejected): ");
+                string inputStatus = Console.ReadLine();
+
+                // Försök konvertera texten till enum, 'true' betyder att vi ignorerar stora/små bokstäver, 'newStatus' kommer att innehålla det konverterade värdet om det lyckas
+                if (Enum.TryParse<JobApplication.Status>(inputStatus, true, out JobApplication.Status newStatus))
+                {
+                    // Om konverteringen lyckas, uppdatera ansökningens status
+                    jobToUpdate.ApplicationStatus = newStatus;
+                    Console.WriteLine($"\nStatus för {jobToUpdate.CompanyName} uppdaterad till {newStatus}.");
+                }
+                else
+                {
+                    // Om koverteringen misslyckas, meddela användaren.
+                    Console.WriteLine("\nOgiltig status!");
+                }
             }
 
-            // Be användaren skriva in den nya statusen
-            Console.Write("Skriv den nya statusen (Applied, Interview, Offer, Rejected): ");
-            string inputStatus = Console.ReadLine();
-
-            // Försöker konvertera den text som användaren skrev in till ett giltigt Status-enumvärde, 
-            // där stora och små bokstäver ignoreras. Om konverteringen lyckas lagras värdet i newStatus.
-            bool success = Enum.TryParse<JobApplication.Status>(inputStatus, true, out JobApplication.Status newStatus);
-
-            if (!success)
-            {
-                Console.WriteLine("Ogiltig status!");
-                return;
-            }
-
-            // Uppdatera status
-            jobToUpdate.ApplicationStatus = newStatus;
-
-            // Bekräfta ändring
-            Console.WriteLine($"Status för {jobToUpdate.CompanyName} uppdaterad till {jobToUpdate.ApplicationStatus}.");
-
+            Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
+            Console.ReadKey();
         }
 
-        // Visar alla ansökningar
+        // Visa alla ansökningar
         public void ShowAll()
         {
-            // Kolla om listan är tom
+            Console.Clear();
+            Console.WriteLine("==== Alla registrerade ansökningar ====\n");
+
+            // Kontrollera att listan inte är tom
             if (Applications.Count == 0)
             {
                 Console.WriteLine("Ingen ansökan har registrerats ännu.");
+                Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
+                Console.ReadKey();
                 return;
             }
 
-            Console.WriteLine("Alla registrerade ansökningar: ");
-
-            // Loopa igenom alla ansökningar
+            // Loopa igenom alla ansökningar och skriv ut
             foreach (var app in Applications)
             {
-                // Färgkodning beroende på status
-                switch (app.ApplicationStatus)
-                {
-                    case JobApplication.Status.Applied:
-                        Console.ForegroundColor = ConsoleColor.Blue; 
-                        break;
-
-                    case JobApplication.Status.Offer:
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        break;
-
-                    case JobApplication.Status.Rejected:
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        break;
-
-                    case JobApplication.Status.Interview:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        break;
-
-                    default:
-                        Console.ForegroundColor = ConsoleColor.White;
-                        break;
-                }
-
-                // Visa information om ansökningarna
-                Console.WriteLine($"Företag: {app.CompanyName}"); 
-                Console.WriteLine($"Tjänst: {app.PositionTitle}");
-                Console.WriteLine($"Status: {app.ApplicationStatus}");
-                Console.WriteLine($"Ansökt: {app.ApplicationDate.ToShortDateString()}");
-                // Funkar som en if sats om Responsedate har värde skriv ut det annars skriv ut inget svar ännu.
-                Console.WriteLine($"Svar: {(app.ResponseDate.HasValue ? app.ResponseDate.Value.ToShortDateString() : "Inget svar ännu")}");
-                Console.WriteLine($"Förväntad lön: {app.SalaryExpectation} kr");
-
-                //  Återställ färg
-                Console.ResetColor();
+                PrintApplication(app); // Använd hjälpfunktion för att skriva ut färgglatt
             }
+
+            Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
+            Console.ReadKey();
         }
 
-        // Filtrerar ansökningar efter status (VG-del)
+        // Filtrera ansökningar efter status 
         public void ShowByStatus()
         {
-            // Kolla om listan är tom
+            Console.Clear();
+            Console.WriteLine("==== Filtrera ansökningar efter status ====\n");
+
+            // Kontrollera att listan inte är tom
             if (Applications.Count == 0)
             {
                 Console.WriteLine("Ingen ansökan finns att filtrera.");
+                Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
+                Console.ReadKey();
                 return;
             }
 
-            // Be användaren skriva in status att filtrera på
-            Console.WriteLine("Vilken status vill du visa? (Applied, Interview, Offer, Rejected)");
+            // Be användaren ange status
+            Console.Write("Vilken status vill du visa? (Applied, Interview, Offer, Rejected): ");
             string inputStatus = Console.ReadLine();
 
-            // Försök konvertera användarens input till enum (ignorerar stora/små bokstäver)
-            bool success = Enum.TryParse<JobApplication.Status>(inputStatus, true, out JobApplication.Status filterStatus);
-
-            if (!success)// Om den inte hittar någon med den statusen i listan
+            // Försök konvertera texten till enum (ignorera stora/små bokstäver)
+            // Om konverteringen misslyckas, skriv ut felmeddelande
+            if (!Enum.TryParse<JobApplication.Status>(inputStatus, true, out JobApplication.Status filterStatus)) 
             {
-                Console.WriteLine("Ogiltig status!");
+                Console.WriteLine("\nOgiltig status!");
+                Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
+                Console.ReadKey();
                 return;
             }
 
-            // Filtrera listan med LINQ – behåll bara ansökningar med vald status
-            var filteredApplications = Applications
-                .Where(a => a.ApplicationStatus == filterStatus);
+            // Filtrera med LINQ efter den valda statusen
+            var filtered = Applications.Where(a => a.ApplicationStatus == filterStatus).ToList();
 
-            // Visa filtrerade ansökningar
-            Console.WriteLine($"Ansökningar med status {filterStatus}:");
-            foreach (var app in filteredApplications)
+            if (filtered.Count == 0) // Om Inga ansökningar finns med den statusen
             {
-                // Färgkodning beroende på status
-                switch (app.ApplicationStatus)
-                {
-                    case JobApplication.Status.Applied:
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        break;
-
-                    case JobApplication.Status.Offer:
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        break;
-
-                    case JobApplication.Status.Rejected:
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        break;
-
-                    case JobApplication.Status.Interview:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        break;
-
-                    default:
-                        Console.ForegroundColor = ConsoleColor.White;
-                        break;
-                }
-
-                // Visa information om ansökningarna
-                Console.WriteLine($"Företag: {app.CompanyName}");
-                Console.WriteLine($"Tjänst: {app.PositionTitle}");
-                Console.WriteLine($"Status: {app.ApplicationStatus}");
-                Console.WriteLine($"Ansökt: {app.ApplicationDate.ToShortDateString()}");
-                // Funkar som en if sats om Responsedate har värde skriv ut det annars skriv ut inget svar ännu.
-                Console.WriteLine($"Svar: {(app.ResponseDate.HasValue ? app.ResponseDate.Value.ToShortDateString() : "Inget svar ännu")}");
-                Console.WriteLine($"Förväntad lön: {app.SalaryExpectation} kr");
-                Console.WriteLine();
-
-                //  Återställ färg
-                Console.ResetColor();
+                Console.WriteLine($"\nInga ansökningar med status {filterStatus}.");
             }
+            else // Annars skriv ut Ansökningarna i de olika statusarna
+            {
+                Console.WriteLine($"\nAnsökningar med status {filterStatus}:\n"); 
+                foreach (var app in filtered)
+                {
+                    PrintApplication(app); // Använd hjälpmetoden för att skriva ut snygg med färger
+                }
+            }
+
+            Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
+            Console.ReadKey();
         }
 
-        // Visar statistik över ansökningar (VG-del)
+        // Visa statistik 
         public void ShowStatistics()
         {
-            if ( Applications.Count == 0 )
-            { 
-                Console.WriteLine("Listan är tom");
-                return; 
-            }
+            Console.Clear();
+            Console.WriteLine("==== Statistik över ansökningar ====\n");
 
-            int totalApplications = Applications.Count; // Skapa en variabel för hur många ansökningar som finns med hjälp av count
-            Console.WriteLine($"Totalt antal ansökningar: {totalApplications}"); // Skriva ut antalet till användaren
-
-            var groupByStatus = Applications.GroupBy(a => a.ApplicationStatus); // Grupperar listan efter status genom att använda LINQ
-            foreach (var group in groupByStatus)
+            // Kontrollera att listan inte är tom
+            if (Applications.Count == 0)
             {
-                Console.WriteLine($"Status: {group.Key} - Antal: {group.Count()}"); // Skriver ut group.key för att få statusen och sedan count för antalet i gryppen
+                Console.WriteLine("Ingen data finns att visa.");
+                Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
+                Console.ReadKey();
+                return;
             }
 
-            // Filtrera bort ansökningar utan svar (ResponseDate = null)
-            var answeredApplications = Applications.Where(a => a.ResponseDate.HasValue);
+            // Totalt antal ansökningar
+            int total = Applications.Count;
+            Console.WriteLine($"Totalt antal ansökningar: {total}\n");
 
-            // Beräkna genomsnittlig svarstid i antal dagar
-            double averageResponseTime = answeredApplications.Average(a => (a.ResponseDate.Value - a.ApplicationDate).TotalDays);
-            Console.WriteLine($"Genomsnittlig svarstid är {averageResponseTime:f1} dagar"); // Skriver ut antal dagar med en decimal
+            // Gruppindelning per status med LINQ
+            var grouped = Applications.GroupBy(a => a.ApplicationStatus);
+            foreach (var g in grouped)
+            {
+                Console.WriteLine($"Status: {g.Key} - Antal: {g.Count()}"); // Skriver ut vilken status och hur många som finns i den gruppen
+            }
+
+            // Filtrera bort ansökningar som inte har fått något svar än
+            var answered = Applications.Where(a => a.ResponseDate.HasValue).ToList();
+
+            // Om det finns minst en ansökan med svar
+            if (answered.Count > 0)
+            {
+                // Beräkna genomsnittlig svarstid i dagar
+                // (Svardatum - ansökningsdatum) och ta medelvärdet
+                double avgResponse = answered.Average(a => (a.ResponseDate.Value - a.ApplicationDate).TotalDays);
+
+                // Skriv ut genomsnittlig svarstid med en decimal
+                Console.WriteLine($"\nGenomsnittlig svarstid: {avgResponse:f1} dagar");
+            }
+
+            Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
+            Console.ReadKey();
         }
 
-        // Skriva ut ansökningar efter datum
+        // Sortera ansökningar efter datum
         public void SortedApplications()
         {
-            if (Applications.Count == 0)
+            Console.Clear();
+            Console.WriteLine("==== Ansökningar sorterade efter datum ====\n");
+
+            if (Applications.Count == 0)   // Kontrollera om listan är tom
             {
                 Console.WriteLine("Inga ansökningar finns att sortera.");
+                Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
+                Console.ReadKey();
                 return;
             }
 
-            // Sortera ansökningarna efter datum (äldst först)
-            var sortedList = Applications.OrderBy(a => a.ApplicationDate).ToList();
+            // Sortera ansökningarna med LINQ efter ansökningsdatum (äldst först)
+            var sorted = Applications.OrderBy(a => a.ApplicationDate).ToList();
 
-            Console.WriteLine("Ansökningar sorterade efter datum (äldst till nyast):");
-
-            foreach (var app in sortedList)
+            // Skriv ut varje ansökan med en separat metod som formaterar snyggt
+            foreach (var app in sorted)
             {
-                Console.WriteLine($"Datum: {app.ApplicationDate.ToShortDateString()} - Företag: {app.CompanyName} - Tjänst: {app.PositionTitle} - Status: {app.ApplicationStatus}");
+                PrintApplication(app); // Änvänder hjälpmetoden
             }
+
+            Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
+            Console.ReadKey();
         }
 
+        // Ta bort ansökan
         public void RemoveApplication()
         {
-            if (Applications.Count == 0)
+            Console.Clear();
+            Console.WriteLine("==== Ta bort en ansökan ====\n");
+
+            if (Applications.Count == 0) // Kollar om listan är tom
             {
                 Console.WriteLine("Det finns inga ansökningar att ta bort.");
+                Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
+                Console.ReadKey();
                 return;
             }
 
-            Console.WriteLine("Ange företagsnamnet för den ansökan du vill ta bort:");
+            // Visa alla företagsnamn så användaren vet vad som finns
+            Console.WriteLine("Följande ansökningar finns registrerade:\n");
+            foreach (var app in Applications)
+            {
+                Console.WriteLine($"- {app.CompanyName}");
+            }
+            Console.WriteLine(); 
+
+            // Be användaren ange företagsnamn
+            Console.Write("Ange företagsnamnet för den ansökan du vill ta bort: ");
             string inputCompany = Console.ReadLine();
 
-            // Hitta ansökan (ignorera stora/små bokstäver)
+            // Hitta ansökan som matchar företagsnamnet (ignorera stora/små bokstäver)
             var appToRemove = Applications.FirstOrDefault(a =>
                 a.CompanyName.Equals(inputCompany, StringComparison.OrdinalIgnoreCase));
 
-            if (appToRemove == null)
+            if (appToRemove == null) // Om ingen ansökan hittades
             {
-                Console.WriteLine("Ingen ansökan hittades med det företagsnamnet.");
-                return;
+                Console.WriteLine("\nIngen ansökan hittades med det företagsnamnet.");
+            }
+            else
+            {   // TA bort ansökan från listan
+                Applications.Remove(appToRemove);
+                Console.WriteLine($"\nAnsökan till {appToRemove.CompanyName} har tagits bort.");
             }
 
-            Applications.Remove(appToRemove);
-            Console.WriteLine($"Ansökan till {appToRemove.CompanyName} har tagits bort.");
+            Console.WriteLine("\nTryck på valfri tangent för att återgå till menyn...");
+            Console.ReadKey();
+        }
+
+        // ------------------- HJÄLPMETOD -------------------
+
+        // Skriv ut information om en ansökan med färg och layout
+        private void PrintApplication(JobApplication app)
+        {
+            // Färg baserat på status med en switch-sats
+            switch (app.ApplicationStatus)
+            {
+                case JobApplication.Status.Applied:
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    break;
+                case JobApplication.Status.Offer:
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    break;
+                case JobApplication.Status.Rejected:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    break;
+                case JobApplication.Status.Interview:
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    break;
+                default:
+                    Console.ForegroundColor = ConsoleColor.White;
+                    break;
+            }
+
+            // Skriv ut info
+            Console.WriteLine($"Företag: {app.CompanyName}");
+            Console.WriteLine($"Tjänst: {app.PositionTitle}");
+            Console.WriteLine($"Status: {app.ApplicationStatus}");
+            Console.WriteLine($"Ansökt: {app.ApplicationDate.ToShortDateString()}");
+            Console.WriteLine($"Svar: {(app.ResponseDate.HasValue ? app.ResponseDate.Value.ToShortDateString() : "Inget svar ännu")}"); // Funkar som en if-sats om app.responsedate har ett värde skriver den ut det annars "Inget svar ännu"
+            Console.WriteLine($"Förväntad lön: {app.SalaryExpectation} kr");
+            Console.WriteLine(new string('-', 40)); // Linje mellan ansökningar
+
+            Console.ResetColor();
         }
     }
 }
