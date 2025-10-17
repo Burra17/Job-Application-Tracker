@@ -11,6 +11,7 @@ namespace Job_Application_Tracker
         //Metod för att skriva ut meny
         public static void ShowMenu()
         {
+            Console.Clear();
             Console.WriteLine("1. Lägg till ny ansökan: ");
             Console.WriteLine("2. Visa alla ansökningar: ");
             Console.WriteLine("3. Filtrera ansökningar efter status: ");
